@@ -7,7 +7,7 @@ Created on Tue Apr 28 19:17:47 2020
 """
 
 
-from src import torch_openpose,util
+from openpose_pytorch import torch_openpose,util
 
 import cv2
 

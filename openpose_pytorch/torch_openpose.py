@@ -4,24 +4,24 @@ import math
 from scipy.ndimage.filters import gaussian_filter
 import torch
 
-from src import util
-from src.model import bodypose_model,bodypose_25_model
+from openpose_pytorch import util
+from openpose_pytorch.model import bodypose_model,bodypose_25_model
 
 model_coco = 'model/body_coco.pth'
 model_body25 = 'model/body_25.pth'
 
 class torch_openpose(object):
-    def __init__(self, model_type):
+    def __init__(self, model_type, model_path=None):
         if model_type == 'body_25':
             self.model = bodypose_25_model()
             self.njoint = 26
             self.npaf = 52
-            self.model.load_state_dict(torch.load(model_body25))
+            self.model.load_state_dict(torch.load(model_body25 if model_path is None else model_path))
         else:
             self.model = bodypose_model()
             self.njoint = 19
             self.npaf = 38
-            self.model.load_state_dict(torch.load(model_coco))
+            self.model.load_state_dict(torch.load(model_coco if model_path is None else model_path))
         if torch.cuda.is_available():
             self.model = self.model.cuda()
         self.model.eval()
@@ -135,6 +135,7 @@ class torch_openpose(object):
                     for j in range(nB):
                         vec = np.subtract(candB[j][:2], candA[i][:2])
                         norm = math.sqrt(vec[0] * vec[0] + vec[1] * vec[1])
+                        norm = max(0.001, norm)
                         vec = np.divide(vec, norm)
 
                         startend = list(zip(np.linspace(candA[i][0], candB[j][0], num=mid_num), \

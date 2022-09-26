@@ -69,3 +69,19 @@ def padRightDownCorner(img, stride, padValue):
     img_padded = np.concatenate((img_padded, pad_right), axis=1)
 
     return img_padded, pad
+
+def convert_to_official_output_body(poses):
+    output = {}
+    output['version'] = 1.3
+    output['people'] = []
+
+    for pose in poses:
+        people = { "people_id" : [-1], 
+            "face_keypoints_2d":[], "hand_left_keypoints_2d":[], 
+            "hand_right_keypoints_2d":[],"pose_keypoints_3d":[],
+            "face_keypoints_3d":[],"hand_left_keypoints_3d":[],}
+        for keypoint in pose:
+            people.setdefault("pose_keypoints_2d", []).extend(keypoint)
+        output['people'].append(people)
+
+    return output
